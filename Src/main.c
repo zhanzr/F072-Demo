@@ -121,22 +121,16 @@ int main(void)
 		*(uint16_t*)(0x1FFFF7C2),
 		*(uint16_t*)(0x1FFFF7BA)
 		);
-
 	printf("%08X, %08X\n", SCB->CPUID, (1UL << SCB_AIRCR_ENDIANESS_Pos));
-		
-//	LCD_Initialize();
-	
+			
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	
-	LiquidCrystal lcd(12, 11, 10, 5, 4, 3, 2);
+	LiquidCrystal lcd;
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
   // Print a message to the LCD.
-  lcd.write('A');
-	
-//	LCD_displayL(0, 0, "AAAAA");
-//	LCD_displayL(1, 0, "BBBBB");
+  lcd.write('B');
 	
 	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_ADCBuf, ADC_CHAN_NO);	
   /* USER CODE END 2 */
@@ -156,15 +150,7 @@ int main(void)
 		
 		HAL_IWDG_Refresh(&hiwdg);		
 		
-//		LCD_displayL(0, 0, "LD6_Pin");
-//		HAL_GPIO_TogglePin(RS_GPIO_Port, RS_Pin);
-//		HAL_GPIO_TogglePin(RW_GPIO_Port, RW_Pin);
-//		HAL_GPIO_TogglePin(E_GPIO_Port, E_Pin);
-//		HAL_GPIO_TogglePin(DB4_GPIO_Port, DB4_Pin);		
-//		HAL_GPIO_TogglePin(DB5_GPIO_Port, DB5_Pin);		
-//		HAL_GPIO_TogglePin(DB6_GPIO_Port, DB6_Pin);		
-//		HAL_GPIO_TogglePin(DB7_GPIO_Port, DB7_Pin);		
-		HAL_Delay(8000);	
+		HAL_Delay(5000);	
 
 		lcd.setCursor(rand()%16, HAL_GetTick()%2);
 		lcd.write(rand()%0x100);

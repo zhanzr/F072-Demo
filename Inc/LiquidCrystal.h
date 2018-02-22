@@ -65,20 +65,9 @@
 
 class LiquidCrystal{
 public:
-  LiquidCrystal(uint8_t rs, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-		uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7);
-  LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-		uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7);
-  LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3);
-  LiquidCrystal(uint8_t rs, uint8_t enable,
-		uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3);
+	LiquidCrystal(void);
 
-  void init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
-	    uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-	    uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7);
+	void init(void);
     
   void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
 
@@ -103,7 +92,7 @@ public:
   void setCursor(uint8_t, uint8_t); 
   virtual size_t write(uint8_t);
   void command(uint8_t);
-  
+	//TODO: Port the Arduino Print class   
 //  using Print::write;
 private:
   void send(uint8_t value, GPIO_PinState mode);
@@ -111,10 +100,7 @@ private:
   void write8bits(uint8_t);
   void pulseEnable();
 
-//  uint8_t _rs_pin; // LOW: command.  HIGH: character.
-//  uint8_t _rw_pin; // LOW: write to LCD.  HIGH: read from LCD.
-//  uint8_t _enable_pin; // activated by a HIGH pulse.
-//  uint8_t _data_pins[8];
+	static void SimpleDelay(uint32_t t);
 
   uint8_t _displayfunction;
   uint8_t _displaycontrol;
@@ -124,6 +110,81 @@ private:
 
   uint8_t _numlines;
   uint8_t _row_offsets[4];
+
+	void RS_H(void)
+	{	
+		HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, GPIO_PIN_SET);
+	}
+
+	void RS_L(void)
+	{
+		HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, GPIO_PIN_RESET);
+	}
+
+	void RW_H(void)
+	{
+		HAL_GPIO_WritePin(RW_GPIO_Port, RW_Pin, GPIO_PIN_SET);
+	}
+
+	void RW_L(void)
+	{
+		HAL_GPIO_WritePin(RW_GPIO_Port, RW_Pin, GPIO_PIN_RESET);
+	}
+
+	void E_H(void)
+	{
+		HAL_GPIO_WritePin(E_GPIO_Port, E_Pin, GPIO_PIN_SET);
+	}
+
+	void E_L(void)
+	{
+		HAL_GPIO_WritePin(E_GPIO_Port, E_Pin, GPIO_PIN_RESET);
+	}
+
+	void D4_H(void)
+	{
+		HAL_GPIO_WritePin(DB4_GPIO_Port, DB4_Pin, GPIO_PIN_SET);
+	}
+
+	void D4_L(void)
+	{
+		HAL_GPIO_WritePin(DB4_GPIO_Port, DB4_Pin, GPIO_PIN_RESET);
+	}
+
+	void D5_H(void)
+	{
+		HAL_GPIO_WritePin(DB5_GPIO_Port, DB5_Pin, GPIO_PIN_SET);
+	}
+
+	void D5_L(void)
+	{
+		HAL_GPIO_WritePin(DB5_GPIO_Port, DB5_Pin, GPIO_PIN_RESET);
+	}
+
+	void D6_H(void)
+	{
+		HAL_GPIO_WritePin(DB6_GPIO_Port, DB6_Pin, GPIO_PIN_SET);
+	}
+
+	void D6_L(void)
+	{
+		HAL_GPIO_WritePin(DB6_GPIO_Port, DB6_Pin, GPIO_PIN_RESET);
+	}
+
+	void D7_H(void)
+	{
+		HAL_GPIO_WritePin(DB7_GPIO_Port, DB7_Pin, GPIO_PIN_SET);
+	}
+
+	void D7_L(void)
+	{
+		HAL_GPIO_WritePin(DB7_GPIO_Port, DB7_Pin, GPIO_PIN_RESET);
+	}
+	
+	uint32_t ReadD7(void)
+	{
+		return HAL_GPIO_ReadPin(DB7_GPIO_Port, DB7_Pin);
+	}
 };
 
 #ifdef __cplusplus

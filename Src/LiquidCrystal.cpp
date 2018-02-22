@@ -1,104 +1,6 @@
 #include "LiquidCrystal.h"
 
-static inline void RS_H(void)
-{	
-	HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, GPIO_PIN_SET);
-}
-
-static inline void RS_L(void)
-{
-	HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, GPIO_PIN_RESET);
-}
-
-static inline void RW_H(void)
-{
-	HAL_GPIO_WritePin(RW_GPIO_Port, RW_Pin, GPIO_PIN_SET);
-}
-
-static inline void RW_L(void)
-{
-	HAL_GPIO_WritePin(RW_GPIO_Port, RW_Pin, GPIO_PIN_RESET);
-}
-
-static inline void E_H(void)
-{
-	HAL_GPIO_WritePin(E_GPIO_Port, E_Pin, GPIO_PIN_SET);
-}
-
-static inline void E_L(void)
-{
-	HAL_GPIO_WritePin(E_GPIO_Port, E_Pin, GPIO_PIN_RESET);
-}
-
-static inline void D4_H(void)
-{
-	HAL_GPIO_WritePin(DB4_GPIO_Port, DB4_Pin, GPIO_PIN_SET);
-}
-
-static inline void D4_L(void)
-{
-	HAL_GPIO_WritePin(DB4_GPIO_Port, DB4_Pin, GPIO_PIN_RESET);
-}
-
-static inline void D5_H(void)
-{
-	HAL_GPIO_WritePin(DB5_GPIO_Port, DB5_Pin, GPIO_PIN_SET);
-}
-
-static inline void D5_L(void)
-{
-	HAL_GPIO_WritePin(DB5_GPIO_Port, DB5_Pin, GPIO_PIN_RESET);
-}
-
-static inline void D6_H(void)
-{
-	HAL_GPIO_WritePin(DB6_GPIO_Port, DB6_Pin, GPIO_PIN_SET);
-}
-
-static inline void D6_L(void)
-{
-	HAL_GPIO_WritePin(DB6_GPIO_Port, DB6_Pin, GPIO_PIN_RESET);
-}
-
-static inline void D7_H(void)
-{
-	HAL_GPIO_WritePin(DB7_GPIO_Port, DB7_Pin, GPIO_PIN_SET);
-}
-
-static inline void D7_L(void)
-{
-	HAL_GPIO_WritePin(DB7_GPIO_Port, DB7_Pin, GPIO_PIN_RESET);
-}
-
-static inline uint32_t ReadD4(void)
-{
-	return HAL_GPIO_ReadPin(DB4_GPIO_Port, DB4_Pin);
-}
-
-static inline uint32_t ReadD5(void)
-{
-	return HAL_GPIO_ReadPin(DB5_GPIO_Port, DB5_Pin);
-}
-
-static inline uint32_t ReadD6(void)
-{
-	return HAL_GPIO_ReadPin(DB6_GPIO_Port, DB6_Pin);
-}
-
-static inline uint32_t ReadD7(void)
-{
-	return HAL_GPIO_ReadPin(DB7_GPIO_Port, DB7_Pin);
-}
-
-static inline void DB4_Wr(uint8_t dat)
-{
-		(0==(dat&0x08))?D7_L():D7_H();
-		(0==(dat&0x04))?D6_L():D6_H();
-		(0==(dat&0x02))?D5_L():D5_H();
-		(0==(dat&0x01))?D4_L():D4_H();
-}
-
-static inline void SimpleDelay(uint32_t t)
+void LiquidCrystal::SimpleDelay(uint32_t t)
 {
 	uint32_t d = t * 1;
 	while(--d)
@@ -106,7 +8,6 @@ static inline void SimpleDelay(uint32_t t)
 		__NOP();
 	}
 }
-
 
 // When the display powers up, it is configured as follows:
 //
@@ -123,40 +24,18 @@ static inline void SimpleDelay(uint32_t t)
 //    I/D = 1; Increment by 1 
 //    S = 0; No shift 
 //
-// Note, however, that resetting the Arduino doesn't reset the LCD, so we
+// Note, however, that resetting the Micro controller doesn't reset the LCD, so we
 // can't assume that its in that state when a sketch starts (and the
 // LiquidCrystal constructor is called).
 
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-			     uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-			     uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
+LiquidCrystal::LiquidCrystal(void)
 {
-  init(0, rs, rw, enable, d0, d1, d2, d3, d4, d5, d6, d7);
+	init();
 }
 
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t enable,
-			     uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-			     uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
+void LiquidCrystal::init(void)
 {
-  init(0, rs, 255, enable, d0, d1, d2, d3, d4, d5, d6, d7);
-}
-
-LiquidCrystal::LiquidCrystal(uint8_t rs, uint8_t rw, uint8_t enable,
-			     uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
-{
-  init(1, rs, rw, enable, d0, d1, d2, d3, 0, 0, 0, 0);
-}
-
-LiquidCrystal::LiquidCrystal(uint8_t rs,  uint8_t enable,
-			     uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3)
-{
-  init(1, rs, 255, enable, d0, d1, d2, d3, 0, 0, 0, 0);
-}
-
-void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t enable,
-			 uint8_t d0, uint8_t d1, uint8_t d2, uint8_t d3,
-			 uint8_t d4, uint8_t d5, uint8_t d6, uint8_t d7)
-{
+	//GPIO Initialization has been completed in other place	
 //  _rs_pin = rs;
 //  _rw_pin = rw;
 //  _enable_pin = enable;
@@ -171,10 +50,6 @@ void LiquidCrystal::init(uint8_t fourbitmode, uint8_t rs, uint8_t rw, uint8_t en
 //  _data_pins[7] = d7; 
 
 	_displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-//  if (fourbitmode)
-//    _displayfunction = LCD_4BITMODE | LCD_1LINE | LCD_5x8DOTS;
-//  else 
-//    _displayfunction = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
   
   begin(16, 1);  
 }
@@ -407,32 +282,25 @@ void LiquidCrystal::send(uint8_t value, GPIO_PinState mode) {
 
 void LiquidCrystal::pulseEnable(void) {
   E_L();
-	SimpleDelay(100);
+	SimpleDelay(10);
 	E_H();
-	SimpleDelay(100);
    // enable pulse must be >450ns
+	SimpleDelay(10);
   E_L();
 
-	HAL_Delay(1); // commands need > 37us to settle
+ // commands need > 37us to settle	
+	SimpleDelay(200);
 }
 
 void LiquidCrystal::write4bits(uint8_t value) {
-//  for (int i = 0; i < 4; i++) {
-//    digitalWrite(_data_pins[i], (value >> i) & 0x01);
-//  }
-	(0==((value >> 0) & 0x01))? D4_L():D4_H();
-	(0==((value >> 1) & 0x01))? D5_L():D5_H();
-	(0==((value >> 2) & 0x01))? D6_L():D6_H();
-	(0==((value >> 3) & 0x01))? D7_L():D7_H();
+		(0==(value&0x08))?D7_L():D7_H();
+		(0==(value&0x04))?D6_L():D6_H();
+		(0==(value&0x02))?D5_L():D5_H();
+		(0==(value&0x01))?D4_L():D4_H();
 	
   pulseEnable();
 }
 
 void LiquidCrystal::write8bits(uint8_t value) {
 	//TODO: Remove 8bit mode
-//  for (int i = 0; i < 8; i++) {
-//    digitalWrite(_data_pins[i], (value >> i) & 0x01);
-//  }
-//  
-//  pulseEnable();
 }
