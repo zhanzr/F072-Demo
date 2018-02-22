@@ -1,7 +1,8 @@
 /**
   ******************************************************************************
-  * File Name          : main.hpp
-  * Description        : This file contains the common defines of the application
+  * @file           : main.h
+  * @brief          : Header for main.c file.
+  *                   This file contains the common defines of the application.
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -35,17 +36,19 @@
   *
   ******************************************************************************
   */
+
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __MAIN_H
-#define __MAIN_H
-  /* Includes ------------------------------------------------------------------*/
+#ifndef __MAIN_H__
+#define __MAIN_H__
 
 /* Includes ------------------------------------------------------------------*/
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Private define ------------------------------------------------------------*/
+#define SYS_TICK_HZ 1000
 
 #define NCS_MEMS_SPI_Pin GPIO_PIN_0
 #define NCS_MEMS_SPI_GPIO_Port GPIOC
@@ -55,6 +58,8 @@
 #define MEMS_INT2_GPIO_Port GPIOC
 #define B1_Pin GPIO_PIN_0
 #define B1_GPIO_Port GPIOA
+#define RS_Pin GPIO_PIN_1
+#define RS_GPIO_Port GPIOA
 #define EXT_RESET_Pin GPIO_PIN_5
 #define EXT_RESET_GPIO_Port GPIOC
 #define I2C2_SCL_Pin GPIO_PIN_10
@@ -83,6 +88,18 @@
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
 #define SWCLK_GPIO_Port GPIOA
+#define DB4_Pin GPIO_PIN_4
+#define DB4_GPIO_Port GPIOB
+#define DB5_Pin GPIO_PIN_5
+#define DB5_GPIO_Port GPIOB
+#define DB6_Pin GPIO_PIN_6
+#define DB6_GPIO_Port GPIOB
+#define DB7_Pin GPIO_PIN_7
+#define DB7_GPIO_Port GPIOB
+#define E_Pin GPIO_PIN_8
+#define E_GPIO_Port GPIOB
+#define RW_Pin GPIO_PIN_9
+#define RW_GPIO_Port GPIOB
 
 /* ########################## Assert Selection ############################## */
 /**
@@ -105,13 +122,6 @@ void _Error_Handler(char *, int);
 }
 #endif
 
-/**
-  * @}
-  */ 
+#endif /* __MAIN_H__ */
 
-/**
-  * @}
-*/ 
-
-#endif /* __MAIN_H */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

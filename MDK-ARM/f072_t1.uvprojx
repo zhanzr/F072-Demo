@@ -137,8 +137,8 @@
             <DriverSelection>4100</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
-          <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash2>BIN\UL2CM3.DLL</Flash2>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -187,7 +187,7 @@
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
-            <useUlib>1</useUlib>
+            <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
             <nSecure>0</nSecure>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F072xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc; ../Drivers/STM32F0xx_HAL_Driver/Inc; ../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy; ../Drivers/CMSIS/Device/ST/STM32F0xx/Include; ../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;    ../Drivers/STM32F0xx_HAL_Driver/Inc;    ../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;    ../Drivers/CMSIS/Device/ST/STM32F0xx/Include;    ../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,7 +392,7 @@
           <Files>
             <File>
               <FileName>main.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>../Src/main.c</FilePath>
             </File>
             <File>
@@ -594,6 +594,36 @@
               <FileName>system_stm32f0xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/system_stm32f0xx.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>doc</GroupName>
+          <Files>
+            <File>
+              <FileName>README.md</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\README.md</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>lcd2004</GroupName>
+          <Files>
+            <File>
+              <FileName>LiquidCrystal.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\Src\LiquidCrystal.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>stdio_drv</GroupName>
+          <Files>
+            <File>
+              <FileName>retarget_io_drv.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\retarget_io_drv.c</FilePath>
             </File>
           </Files>
         </Group>

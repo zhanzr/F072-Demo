@@ -61,6 +61,11 @@ void MX_CRC_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
+  if (HAL_CRCEx_Init(&hcrc) != HAL_OK)
+  {
+    _Error_Handler(__FILE__, __LINE__);
+  }
+
 }
 
 void HAL_CRC_MspInit(CRC_HandleTypeDef* crcHandle)

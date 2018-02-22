@@ -1,7 +1,7 @@
 /**
   ******************************************************************************
-  * File Name          : main.c
-  * Description        : Main program body
+  * @file           : main.c
+  * @brief          : Main program body
   ******************************************************************************
   ** This notice applies to any and all portions of this file
   * that are not between comment pairs USER CODE BEGIN and
@@ -35,7 +35,6 @@
   *
   ******************************************************************************
   */
-
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f0xx_hal.h"
@@ -51,6 +50,8 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
+//#include "lcd2004.h"
+#include "LiquidCrystal.h"
 
 /* USER CODE END Includes */
 
@@ -72,28 +73,16 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 #define	ADC_CHAN_NO	3
 __IO uint16_t g_ADCBuf[ADC_CHAN_NO];
-#if defined(__ARMCC_VERSION)
-int stdout_putchar (int ch)
-{
-	uint8_t c = ch;
-	HAL_UART_Transmit(&huart1, &c, 1, 1);
-	return ch;
-}
-#else
-int _write (int fd, const void *buf, size_t count)
-{
-	for(uint32_t i=0; i<count; ++i)
-	{
-		HAL_UART_Transmit(&huart1, buf+i, 1, 1);
-	}
-	return count;
-}
-#endif
+
 /* USER CODE END 0 */
 
+/**
+  * @brief  The application entry point.
+  *
+  * @retval None
+  */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -125,7 +114,6 @@ int main(void)
   MX_RTC_Init();
   MX_IWDG_Init();
   MX_TIM2_Init();
-
   /* USER CODE BEGIN 2 */
 	printf("F072 Discovery Test @ %u Hz\n %u %u %u\n",
 		SystemCoreClock,
@@ -136,10 +124,21 @@ int main(void)
 
 	printf("%08X, %08X\n", SCB->CPUID, (1UL << SCB_AIRCR_ENDIANESS_Pos));
 		
-	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_ADCBuf, ADC_CHAN_NO);	
+//	LCD_Initialize();
 	
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	
+	LiquidCrystal lcd(12, 11, 10, 5, 4, 3, 2);
+  // set up the LCD's number of columns and rows:
+  lcd.begin(16, 2);
+  // Print a message to the LCD.
+  lcd.write('A');
+	
+//	LCD_displayL(0, 0, "AAAAA");
+//	LCD_displayL(1, 0, "BBBBB");
+	
+	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_ADCBuf, ADC_CHAN_NO);	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -157,7 +156,19 @@ int main(void)
 		
 		HAL_IWDG_Refresh(&hiwdg);		
 		
-		HAL_Delay(8000);		
+//		LCD_displayL(0, 0, "LD6_Pin");
+//		HAL_GPIO_TogglePin(RS_GPIO_Port, RS_Pin);
+//		HAL_GPIO_TogglePin(RW_GPIO_Port, RW_Pin);
+//		HAL_GPIO_TogglePin(E_GPIO_Port, E_Pin);
+//		HAL_GPIO_TogglePin(DB4_GPIO_Port, DB4_Pin);		
+//		HAL_GPIO_TogglePin(DB5_GPIO_Port, DB5_Pin);		
+//		HAL_GPIO_TogglePin(DB6_GPIO_Port, DB6_Pin);		
+//		HAL_GPIO_TogglePin(DB7_GPIO_Port, DB7_Pin);		
+		HAL_Delay(8000);	
+
+		lcd.setCursor(rand()%16, HAL_GetTick()%2);
+		lcd.write(rand()%0x100);
+
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -167,8 +178,10 @@ int main(void)
 
 }
 
-/** System Clock Configuration
-*/
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
 
@@ -232,45 +245,43 @@ void SystemClock_Config(void)
 
 /**
   * @brief  This function is executed in case of error occurrence.
-  * @param  None
+  * @param  file: The file name as string.
+  * @param  line: The line in file as a number.
   * @retval None
   */
-void _Error_Handler(char * file, int line)
+void _Error_Handler(char *file, int line)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
   }
-  /* USER CODE END Error_Handler_Debug */ 
+  /* USER CODE END Error_Handler_Debug */
 }
 
-#ifdef USE_FULL_ASSERT
-
+#ifdef  USE_FULL_ASSERT
 /**
-   * @brief Reports the name of the source file and the source line number
-   * where the assert_param error has occurred.
-   * @param file: pointer to the source file name
-   * @param line: assert_param error line source number
-   * @retval None
-   */
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
 void assert_failed(uint8_t* file, uint32_t line)
-{
+{ 
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
-
 }
-
-#endif
-
-/**
-  * @}
-  */ 
+#endif /* USE_FULL_ASSERT */
 
 /**
   * @}
-*/ 
+  */
+
+/**
+  * @}
+  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

@@ -55,6 +55,7 @@ void MX_RTC_Init(void)
     /**Initialize RTC Only 
     */
   hrtc.Instance = RTC;
+if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
   hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
   hrtc.Init.AsynchPrediv = 127;
   hrtc.Init.SynchPrediv = 255;
@@ -88,7 +89,6 @@ void MX_RTC_Init(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != 0x32F2){
     HAL_RTCEx_BKUPWrite(&hrtc,RTC_BKP_DR0,0x32F2);
   }
 
