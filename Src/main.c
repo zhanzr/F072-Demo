@@ -65,6 +65,8 @@ void MX_FREERTOS_Init(void);
 __IO int16_t g_adc_buf[ADC_CHAN_NO];
 __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 __IO uint8_t g_mems_id;
+
+xTimerHandle Timer_id;
 //Re-implement any functions that require re-implementation.
 
 
@@ -121,6 +123,11 @@ static void MEMS_Test(void)
       }
     }
 
+}
+
+void TimerCallback( xTimerHandle pxtimer )
+{
+		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 }
 /* USER CODE END 0 */
 
@@ -190,6 +197,11 @@ int main(void)
 
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
+
+	/* Create one Software Timer.*/
+	Timer_id = xTimerCreate("Timer",500,pdTRUE,0,TimerCallback);
+	/* Start Timer.*/
+	xTimerStart( Timer_id, 0);
 
   /* Start scheduler */
   osKernelStart();
