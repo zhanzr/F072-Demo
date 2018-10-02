@@ -41,6 +41,8 @@
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_adc;
+extern DMA_HandleTypeDef hdma_spi2_rx;
+extern DMA_HandleTypeDef hdma_spi2_tx;
 extern DMA_HandleTypeDef hdma_usart1_rx;
 extern DMA_HandleTypeDef hdma_usart1_tx;
 
@@ -123,6 +125,36 @@ void DMA1_Channel2_3_IRQHandler(void)
   /* USER CODE BEGIN DMA1_Channel2_3_IRQn 1 */
 
   /* USER CODE END DMA1_Channel2_3_IRQn 1 */
+}
+
+/**
+* @brief This function handles DMA1 channel 4, 5, 6 and 7 interrupts.
+*/
+void DMA1_Channel4_5_6_7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel4_5_6_7_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel4_5_6_7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_spi2_rx);
+  HAL_DMA_IRQHandler(&hdma_spi2_tx);
+
+  /* USER CODE BEGIN DMA1_Channel4_5_6_7_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel4_5_6_7_IRQn 1 */
+}
+
+/**
+* @brief This function handles ADC and COMP interrupts (COMP interrupts through EXTI lines 21 and 22).
+*/
+void ADC1_COMP_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC1_COMP_IRQn 0 */
+
+  /* USER CODE END ADC1_COMP_IRQn 0 */
+//  HAL_ADC_IRQHandler(&hadc);
+  /* USER CODE BEGIN ADC1_COMP_IRQn 1 */
+
+  /* USER CODE END ADC1_COMP_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

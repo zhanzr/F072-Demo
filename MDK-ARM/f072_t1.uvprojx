@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F072xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include;F:\xmc1100_prj\coremark_v1.0;F:\xmc1100_prj\coremark_v1.0\F072</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -407,14 +407,14 @@
               <FilePath>../Src/adc.c</FilePath>
             </File>
             <File>
-              <FileName>crc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/crc.c</FilePath>
-            </File>
-            <File>
               <FileName>dma.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>crc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/crc.c</FilePath>
             </File>
             <File>
               <FileName>i2c.c</FileName>
@@ -455,6 +455,11 @@
               <FileName>stm32f0xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32f0xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>l3gd20.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Src\l3gd20.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -618,41 +623,6 @@
               <FileName>retarget_io_drv.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\retarget_io_drv.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>coremark</GroupName>
-          <Files>
-            <File>
-              <FileName>core_list_join.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>F:\xmc1100_prj\coremark_v1.0\core_list_join.c</FilePath>
-            </File>
-            <File>
-              <FileName>core_main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>F:\xmc1100_prj\coremark_v1.0\core_main.c</FilePath>
-            </File>
-            <File>
-              <FileName>core_matrix.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>F:\xmc1100_prj\coremark_v1.0\core_matrix.c</FilePath>
-            </File>
-            <File>
-              <FileName>core_state.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>F:\xmc1100_prj\coremark_v1.0\core_state.c</FilePath>
-            </File>
-            <File>
-              <FileName>core_util.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>F:\xmc1100_prj\coremark_v1.0\core_util.c</FilePath>
-            </File>
-            <File>
-              <FileName>core_portme.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>F:\xmc1100_prj\coremark_v1.0\F072\core_portme.c</FilePath>
             </File>
           </Files>
         </Group>

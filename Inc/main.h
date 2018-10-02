@@ -51,6 +51,7 @@
 #define SYS_TICK_HZ 1000
 #define ADC_CHAN_NO 3
 #define VDD_MV 3000
+#define MEMS_CHAN_NO 3
 
 #define NCS_MEMS_SPI_Pin GPIO_PIN_0
 #define NCS_MEMS_SPI_GPIO_Port GPIOC
