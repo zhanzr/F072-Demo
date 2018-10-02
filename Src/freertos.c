@@ -4,45 +4,6 @@
   * File Name          : freertos.c
   * Description        : Code for freertos applications
   ******************************************************************************
-  * This notice applies to any and all portions of this file
-  * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
-  * inserted by the user or by software development tools
-  * are owned by their respective copyright owners.
-  *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
-  * All rights reserved.
-  *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
   */
@@ -65,11 +26,19 @@
 #include "LiquidCrystal.h"
 
 using namespace std;
+#else
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdlib.h>
 #endif
-
+#include "gyro.h"
+#include "l3gd20.h"
 #include "retarget_io_drv.h"
 
-extern __IO uint16_t g_ADCBuf[ADC_CHAN_NO];
+extern __IO uint16_t g_adc_buf[ADC_CHAN_NO];
+extern __IO uint8_t g_mems_id;
+extern __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 
 /* USER CODE END Includes */
 
@@ -129,7 +98,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 128);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 256);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask02 */
@@ -154,22 +123,48 @@ void MX_FREERTOS_Init(void) {
 /* USER CODE END Header_StartDefaultTask */
 void StartDefaultTask(void const * argument)
 {
-
   /* USER CODE BEGIN StartDefaultTask */
+	int8_t mems_tmp;
+	int32_t JTemp;	
+	uint32_t VRef;	
+	uint32_t VBat;	
+	
+  float Buffer[6] = {0};  
+	
   /* Infinite loop */
   for(;;)
   {
-		printf("%s\t%u %u %u\n", 
+		printf("%s %s %u\n", 
 		osKernelSystemId,
-		g_ADCBuf[0],
-		ADC_2_MV(g_ADCBuf[1]),
-		2*ADC_2_MV(g_ADCBuf[2])
+		__TIME__,
+		g_adc_buf[0]
 		);
+
+		GYRO_IO_Read((uint8_t*)&mems_tmp, L3GD20_OUT_TEMP_ADDR, 1);
+			
+		JTemp = ((80*g_adc_buf[0]*VDD_MV)/3300 + 30*T110_VAL_3300 - 110*T30_VAL_3300)/(T110_VAL_3300-T30_VAL_3300);
+		VRef = ADC_2_MV(g_adc_buf[1]);
+		VBat = 2 * ADC_2_MV(g_adc_buf[2]);
+		
+		printf("%02X %d %d %d %d\n",
+		g_mems_id, mems_tmp, JTemp, VRef, VBat);
 				
+		GYRO_IO_Read((uint8_t*)g_mems_buf, L3GD20_OUT_X_L_ADDR, MEMS_CHAN_NO*2);
+		printf("X: %d, Y: %d, Z: %d\n", 
+		g_mems_buf[0],
+		g_mems_buf[1],
+		g_mems_buf[2]
+		);
+		
+		/* Read Gyro Angular data */
+		BSP_GYRO_GetXYZ(Buffer);
+		printf("%.3f %.3f %.3f\n",
+		Buffer[0], Buffer[1], Buffer[2]
+		);
+	
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 //		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		
-		HAL_IWDG_Refresh(&hiwdg);				
     osDelay(1000);
   }
   /* USER CODE END StartDefaultTask */

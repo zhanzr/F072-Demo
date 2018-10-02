@@ -4,45 +4,6 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-  * This notice applies to any and all portions of this file
-  * that are not between comment pairs USER CODE BEGIN and
-  * USER CODE END. Other portions of this file, whether 
-  * inserted by the user or by software development tools
-  * are owned by their respective copyright owners.
-  *
-  * Copyright (c) 2018 STMicroelectronics International N.V. 
-  * All rights reserved.
-  *
-  * Redistribution and use in source and binary forms, with or without 
-  * modification, are permitted, provided that the following conditions are met:
-  *
-  * 1. Redistribution of source code must retain the above copyright notice, 
-  *    this list of conditions and the following disclaimer.
-  * 2. Redistributions in binary form must reproduce the above copyright notice,
-  *    this list of conditions and the following disclaimer in the documentation
-  *    and/or other materials provided with the distribution.
-  * 3. Neither the name of STMicroelectronics nor the names of other 
-  *    contributors to this software may be used to endorse or promote products 
-  *    derived from this software without specific written permission.
-  * 4. This software, including modifications and/or derivative works of this 
-  *    software, must execute solely and exclusively on microcontroller or
-  *    microprocessor devices manufactured by or for STMicroelectronics.
-  * 5. Redistribution and use of this software other than as permitted under 
-  *    this license is void and will automatically terminate your rights under 
-  *    this license. 
-  *
-  * THIS SOFTWARE IS PROVIDED BY STMICROELECTRONICS AND CONTRIBUTORS "AS IS" 
-  * AND ANY EXPRESS, IMPLIED OR STATUTORY WARRANTIES, INCLUDING, BUT NOT 
-  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
-  * PARTICULAR PURPOSE AND NON-INFRINGEMENT OF THIRD PARTY INTELLECTUAL PROPERTY
-  * RIGHTS ARE DISCLAIMED TO THE FULLEST EXTENT PERMITTED BY LAW. IN NO EVENT 
-  * SHALL STMICROELECTRONICS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-  * OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
-  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING 
-  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
-  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
   */
@@ -62,7 +23,6 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-#include "retarget_io_drv.h"
 #ifdef __cplusplus
 #include <iostream>
 #include <cstdio>
@@ -72,8 +32,16 @@
 #include "LiquidCrystal.h"
 
 using namespace std;
+#else
+#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdlib.h>
 #endif
 
+#include "gyro.h"
+#include "l3gd20.h"
+#include "retarget_io_drv.h"
 //using namespace std;
 /* USER CODE END Includes */
 
@@ -94,63 +62,66 @@ void MX_FREERTOS_Init(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
-__IO uint16_t g_ADCBuf[ADC_CHAN_NO];
-
+__IO int16_t g_adc_buf[ADC_CHAN_NO];
+__IO int16_t g_mems_buf[MEMS_CHAN_NO];
+__IO uint8_t g_mems_id;
 //Re-implement any functions that require re-implementation.
-#ifdef __cplusplus
-namespace std {
-  struct __FILE
-  {
-    int handle;
-    /* Whatever you require here. If the only file you are using is */
-    /* standard output using printf() for debugging, no file handling */
-    /* is required. */
-  };
-  FILE __stdout;
-  FILE __stdin;
-  FILE __stderr;
-  int fgetc(FILE *f)
-  {
-    /* Your implementation of fgetc(). */
-    return 0;
-  }
-  int fputc(int c, FILE *stream)
-  {
-		stdout_putchar(c);
-		return c;
-  }
-  int ferror(FILE *stream)
-  {
-    fputc('E', stream);
-    fputc('\n', stream);
-		
-		return -1;
-  }
-  long int ftell(FILE *stream)
-  {
-    fputc('T', stream);
-    fputc('\n', stream);
-		
-		return 0;
-  }
-  int fclose(FILE *f)
-  {
-    /* Your implementation of fclose(). */
-    return 0;
-  }
-  int fseek(FILE *f, long nPos, int nMode)
-  {
-    /* Your implementation of fseek(). */
-    return 0;
-  }
-  int fflush(FILE *f)
-  {
-    /* Your implementation of fflush(). */    
-    return 0;
-  }
-}
-#endif
 
+
+/**
+* @brief  MEMS Test.
+* @param  None
+* @retval None
+*/
+static void MEMS_Test(void)
+{
+  float Buffer[6] = {0};
+  uint8_t Xval, Yval = 0;
+  
+  /* Demo Gyroscope */
+  if(BSP_GYRO_Init() != GYRO_OK)
+  {
+    Error_Handler();
+  }
+
+    /* Read Gyro Angular data */
+    BSP_GYRO_GetXYZ(Buffer);
+    
+    /* Update autoreload and capture compare registers value */
+    Xval = abs((int8_t)(Buffer[0]));
+    Yval = abs((int8_t)(Buffer[1]));
+    
+    if(Xval > Yval)
+    {
+      if(Buffer[0] > 5000.0f)
+      {
+        /* Insert 250ms delay */ 
+        HAL_Delay(250);
+      }
+      
+      if(Buffer[0] < -5000.0f)
+      {
+        /* Insert 250ms delay */ 
+        HAL_Delay(250);
+      }
+    }
+    else
+    {
+      if(Buffer[1] > 5000.0f)
+      {
+        /* Insert 250ms delay */ 
+        HAL_Delay(250);
+      }
+      
+      if(Buffer[1] < -5000.0f)
+      {
+
+        /* Insert 250ms delay */ 
+        HAL_Delay(250);
+      }
+    }
+
+}
 /* USER CODE END 0 */
 
 /**
@@ -161,7 +132,10 @@ namespace std {
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	
+	int8_t mems_tmp;
+	int32_t JTemp;	
+	uint32_t VRef;	
+	uint32_t VBat;	
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -189,21 +163,22 @@ int main(void)
   MX_CRC_Init();
   MX_ADC_Init();
   MX_RTC_Init();
-  MX_IWDG_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+	MEMS_Test();
+	
 	printf("F072 Discovery Test CM0 CPUID:%08X, @ %u Hz\n %u %u %u\n",
 		SCB->CPUID,
 		SystemCoreClock,
-		*(uint16_t*)(0x1FFFF7B8),
-		*(uint16_t*)(0x1FFFF7C2),
-		*(uint16_t*)(0x1FFFF7BA)
+		T30_VAL_3300,
+		T110_VAL_3300,
+		VREF_VAL_3300
 		);
-			
+		
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	
-	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_ADCBuf, ADC_CHAN_NO);	
+	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_adc_buf, ADC_CHAN_NO);	
 #ifdef __cplusplus
 	LiquidCrystal lcd;
 	
@@ -223,25 +198,31 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-		printf("%u %u %u\n",
-		g_ADCBuf[0], g_ADCBuf[1], g_ADCBuf[2]
-		);
-		
+	while (1)
+  {		
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 		HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
+		HAL_Delay(2000);
 		
-		HAL_IWDG_Refresh(&hiwdg);		
+		GYRO_IO_Read((uint8_t*)&mems_tmp, L3GD20_OUT_TEMP_ADDR, 1);
+			
+		JTemp = ((80*g_adc_buf[0]*VDD_MV)/3300 + 30*T110_VAL_3300 - 110*T30_VAL_3300)/(T110_VAL_3300-T30_VAL_3300);
+		VRef = ADC_2_MV(g_adc_buf[1]);
+		VBat = 2 * ADC_2_MV(g_adc_buf[2]);
 		
-		HAL_Delay(5000);	
+		printf("%02X %d %d %d %d\n",
+		g_mems_id, mems_tmp, JTemp, VRef, VBat);
+				
+		GYRO_IO_Read((uint8_t*)g_mems_buf, L3GD20_OUT_X_L_ADDR, MEMS_CHAN_NO*2);
+		printf("X: %d, Y: %d, Z: %d\n", 
+		g_mems_buf[0],
+		g_mems_buf[1],
+		g_mems_buf[2]
+		);
 		
-//		lcd.Display(rand()%LiquidCrystal::LINE_NUM, 0, testBuf);
-
   /* USER CODE END WHILE */
-
   /* USER CODE BEGIN 3 */
 
   }

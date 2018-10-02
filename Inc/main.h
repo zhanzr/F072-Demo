@@ -61,7 +61,12 @@
 #define SYS_TICK_HZ 1000
 #define ADC_CHAN_NO 3
 #define	VDD_MV	3000
+#define MEMS_CHAN_NO 3
 
+#define	T30_VAL_3300	(*(uint16_t*)(0x1FFFF7B8))
+#define	T110_VAL_3300	(*(uint16_t*)(0x1FFFF7C2))
+#define	VREF_VAL_3300	(*(uint16_t*)(0x1FFFF7BA))
+		
 #define NCS_MEMS_SPI_Pin GPIO_PIN_0
 #define NCS_MEMS_SPI_GPIO_Port GPIOC
 #define MEMS_INT1_Pin GPIO_PIN_1
