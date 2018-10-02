@@ -50,9 +50,17 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-//#include "lcd2004.h"
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <cstdint>
+#include <cstdlib>
+
+#include "retarget_io_drv.h"
+
 #include "LiquidCrystal.h"
 
+using namespace std;
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -74,6 +82,58 @@ void SystemClock_Config(void);
 #define	ADC_CHAN_NO	3
 __IO uint16_t g_ADCBuf[ADC_CHAN_NO];
 
+//Re-implement any functions that require re-implementation.
+namespace std {
+  struct __FILE
+  {
+    int handle;
+    /* Whatever you require here. If the only file you are using is */
+    /* standard output using printf() for debugging, no file handling */
+    /* is required. */
+  };
+  FILE __stdout;
+  FILE __stdin;
+  FILE __stderr;
+  int fgetc(FILE *f)
+  {
+    /* Your implementation of fgetc(). */
+    return 0;
+  }
+  int fputc(int c, FILE *stream)
+  {
+		stdout_putchar(c);
+		return c;
+  }
+  int ferror(FILE *stream)
+  {
+    fputc('E', stream);
+    fputc('\n', stream);
+		
+		return -1;
+  }
+  long int ftell(FILE *stream)
+  {
+    fputc('T', stream);
+    fputc('\n', stream);
+		
+		return 0;
+  }
+  int fclose(FILE *f)
+  {
+    /* Your implementation of fclose(). */
+    return 0;
+  }
+  int fseek(FILE *f, long nPos, int nMode)
+  {
+    /* Your implementation of fseek(). */
+    return 0;
+  }
+  int fflush(FILE *f)
+  {
+    /* Your implementation of fflush(). */    
+    return 0;
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -84,6 +144,7 @@ __IO uint16_t g_ADCBuf[ADC_CHAN_NO];
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	uint8_t testBuf[21];
 
   /* USER CODE END 1 */
 
@@ -115,7 +176,8 @@ int main(void)
   MX_IWDG_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-	printf("F072 Discovery Test @ %u Hz\n %u %u %u\n",
+	printf("F072 Discovery Test CM0 rev:%u, @ %u Hz\n %u %u %u\n",
+		__CM0_REV,
 		SystemCoreClock,
 		*(uint16_t*)(0x1FFFF7B8),
 		*(uint16_t*)(0x1FFFF7C2),
@@ -127,21 +189,21 @@ int main(void)
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	
 	LiquidCrystal lcd;
-  // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.write('B');
 	
 	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_ADCBuf, ADC_CHAN_NO);	
+	lcd.Display(0, 0, (uint8_t*)__TIME__);	
+	lcd.Display(1, 0, (uint8_t*)__DATE__);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		printf("%u %u %u\n",
+		sprintf((char*)testBuf, "%u %u %u",
+//		printf("%u %u %u\n",
 		g_ADCBuf[0], g_ADCBuf[1], g_ADCBuf[2]
 		);
+		cout<<testBuf<<endl;
 		
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
@@ -152,8 +214,7 @@ int main(void)
 		
 		HAL_Delay(5000);	
 
-		lcd.setCursor(rand()%16, HAL_GetTick()%2);
-		lcd.write(rand()%0x100);
+		lcd.Display(rand()%LiquidCrystal::LINE_NUM, 0, testBuf);
 
   /* USER CODE END WHILE */
 

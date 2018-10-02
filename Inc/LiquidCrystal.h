@@ -69,48 +69,27 @@ public:
 
 	void init(void);
     
-  void begin(uint8_t cols, uint8_t rows, uint8_t charsize = LCD_5x8DOTS);
-
-  void clear();
-  void home();
-
-  void noDisplay();
-  void display();
-  void noBlink();
-  void blink();
-  void noCursor();
-  void cursor();
-  void scrollDisplayLeft();
-  void scrollDisplayRight();
-  void leftToRight();
-  void rightToLeft();
-  void autoscroll();
-  void noAutoscroll();
-
-  void setRowOffsets(int row1, int row2, int row3, int row4);
-  void createChar(uint8_t, uint8_t[]);
-  void setCursor(uint8_t, uint8_t); 
-  virtual size_t write(uint8_t);
-  void command(uint8_t);
-	//TODO: Port the Arduino Print class   
-//  using Print::write;
-private:
-  void send(uint8_t value, GPIO_PinState mode);
-  void write4bits(uint8_t);
-  void write8bits(uint8_t);
-  void pulseEnable();
-
+  void SetPos(uint8_t l,uint8_t hori)
+	{
+		const static uint8_t pos_tab[] = {0x80, 0xc0};
+		
+		WrCmd_4(pos_tab[l%LINE_NUM] + hori);	
+	}
+	
+	void Display(uint8_t l,uint8_t hori,uint8_t *s)
+	{
+		SetPos(l, hori);
+		while(*s)
+		{
+			WrDat_4(*s);
+			s++;
+		}
+	}
+	
 	static void SimpleDelay(uint32_t t);
-
-  uint8_t _displayfunction;
-  uint8_t _displaycontrol;
-  uint8_t _displaymode;
-
-  uint8_t _initialized;
-
-  uint8_t _numlines;
-  uint8_t _row_offsets[4];
-
+	static const uint8_t LINE_NUM = 2;
+	
+private:
 	void RS_H(void)
 	{	
 		HAL_GPIO_WritePin(RS_GPIO_Port, RS_Pin, GPIO_PIN_SET);
@@ -185,6 +164,83 @@ private:
 	{
 		return HAL_GPIO_ReadPin(DB7_GPIO_Port, DB7_Pin);
 	}
+	
+void DB4_Wr(uint8_t dat)
+	{
+		(0==(dat&0x08))?D7_L():D7_H();
+		(0==(dat&0x04))?D6_L():D6_H();
+		(0==(dat&0x02))?D5_L():D5_H();
+		(0==(dat&0x01))?D4_L():D4_H();
+		SimpleDelay(10);
+	}
+
+	void WaitAvail(void)
+	{
+		uint32_t tmpTimeOut = 12000;
+		
+		DB4_Wr(0xff);
+		SimpleDelay(10);
+
+		RS_L(); 
+		SimpleDelay(10);
+		RW_H();
+		SimpleDelay(10);
+		E_H();
+		SimpleDelay(10);
+		while((0!=ReadD7()) && (0!=tmpTimeOut))
+		{
+			__NOP();
+			--tmpTimeOut;
+		}
+		SimpleDelay(10);
+		E_L(); 
+	}
+
+	void WrCmd_4 (uint8_t cmd)
+	{
+		WaitAvail();
+
+		SimpleDelay(10);
+
+		RS_L(); 
+		SimpleDelay(10);
+		RW_L();   	
+		SimpleDelay(10);
+		DB4_Wr(cmd>>4);
+		SimpleDelay(10);
+		E_H();
+		SimpleDelay(10);
+		E_L();
+		SimpleDelay(10);
+		DB4_Wr(cmd);
+		SimpleDelay(10);
+		E_H();
+		SimpleDelay(10);
+		E_L();	
+		SimpleDelay(10);
+	}
+
+	void WrDat_4 (uint8_t dat)
+	{
+		WaitAvail();
+		SimpleDelay(10);		
+		RS_H(); 
+		SimpleDelay(10);		
+		RW_L();   	
+		SimpleDelay(10);		
+		DB4_Wr(dat>>4);
+		SimpleDelay(10);		
+		E_H();
+		SimpleDelay(10);		
+		E_L();
+		SimpleDelay(10);		
+		DB4_Wr(dat);
+		SimpleDelay(10);		
+		E_H();
+		SimpleDelay(10);		
+		E_L();		
+		SimpleDelay(10);		
+	}	
 };
 
 #ifdef __cplusplus
