@@ -73,6 +73,7 @@
 /*#define HAL_SMBUS_MODULE_ENABLED   */
 /*#define HAL_WWDG_MODULE_ENABLED   */
 /*#define HAL_PCD_MODULE_ENABLED   */
+/*#define HAL_EXTI_MODULE_ENABLED   */
 #define HAL_CORTEX_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
 #define HAL_FLASH_MODULE_ENABLED
@@ -161,7 +162,7 @@
   * @brief This is the HAL system configuration section
   */     
 #define  VDD_VALUE                    ((uint32_t)3300) /*!< Value of VDD in mv */           
-#define  TICK_INT_PRIORITY            ((uint32_t)0)    /*!< tick interrupt priority (lowest by default)  */            
+#define  TICK_INT_PRIORITY            ((uint32_t)3)    /*!< tick interrupt priority (lowest by default)  */            
                                                                               /*  Warning: Must be set to higher priority for HAL_Delay()  */
                                                                               /*  and HAL_GetTick() usage under interrupt context          */
 #define  USE_RTOS                     0     
@@ -192,6 +193,10 @@
 #ifdef HAL_RCC_MODULE_ENABLED
  #include "stm32f0xx_hal_rcc.h"
 #endif /* HAL_RCC_MODULE_ENABLED */
+
+#ifdef HAL_EXTI_MODULE_ENABLED
+ #include "stm32f0xx_hal_exti.h"
+#endif /* HAL_EXTI_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
  #include "stm32f0xx_hal_gpio.h"
