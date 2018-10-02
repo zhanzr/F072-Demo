@@ -40,6 +40,9 @@ extern __IO uint16_t g_adc_buf[ADC_CHAN_NO];
 extern __IO uint8_t g_mems_id;
 extern __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 
+extern xSemaphoreHandle notification_semaphore;
+extern xQueueHandle Queue_id;
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -127,16 +130,18 @@ void StartDefaultTask(void const * argument)
 	int8_t mems_tmp;
 	int32_t JTemp;	
 	uint32_t VRef;	
-	uint32_t VBat;	
+	uint32_t tmpTicks;	
 	
   float Buffer[6] = {0};  
 	
   /* Infinite loop */
   for(;;)
   {
-		printf("%s %s %u\n", 
+		xQueueReceive(Queue_id, &tmpTicks, portMAX_DELAY);
+		
+		printf("%s %u %u\n", 
 		osKernelSystemId,
-		__TIME__,
+		tmpTicks,
 		g_adc_buf[0]
 		);
 
@@ -144,10 +149,9 @@ void StartDefaultTask(void const * argument)
 			
 		JTemp = ((80*g_adc_buf[0]*VDD_MV)/3300 + 30*T110_VAL_3300 - 110*T30_VAL_3300)/(T110_VAL_3300-T30_VAL_3300);
 		VRef = ADC_2_MV(g_adc_buf[1]);
-		VBat = 2 * ADC_2_MV(g_adc_buf[2]);
 		
 		printf("%02X %d %d %d %d\n",
-		g_mems_id, mems_tmp, JTemp, VRef, VBat);
+		g_mems_id, mems_tmp, JTemp, VRef, 2 * ADC_2_MV(g_adc_buf[2]));
 				
 		GYRO_IO_Read((uint8_t*)g_mems_buf, L3GD20_OUT_X_L_ADDR, MEMS_CHAN_NO*2);
 		printf("X: %d, Y: %d, Z: %d\n", 
@@ -165,7 +169,7 @@ void StartDefaultTask(void const * argument)
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 //		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		
-    osDelay(1000);
+		xSemaphoreTake(notification_semaphore, portMAX_DELAY);		
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -185,7 +189,12 @@ void StartTask02(void const * argument)
   {
 		HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 //		HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
+
+		xSemaphoreGive(notification_semaphore);		
 		
+		uint32_t tmpTick = osKernelSysTick();
+		xQueueSend(Queue_id, &tmpTick, 0);
+
     osDelay(1000);
   }
   /* USER CODE END StartTask02 */

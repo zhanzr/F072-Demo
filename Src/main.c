@@ -67,6 +67,9 @@ __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 __IO uint8_t g_mems_id;
 
 xTimerHandle Timer_id;
+xSemaphoreHandle notification_semaphore;
+xQueueHandle Queue_id;
+
 //Re-implement any functions that require re-implementation.
 
 
@@ -202,6 +205,14 @@ int main(void)
 	Timer_id = xTimerCreate("Timer",500,pdTRUE,0,TimerCallback);
 	/* Start Timer.*/
 	xTimerStart( Timer_id, 0);
+
+	/* Create the notification semaphore and set the initial state. */
+	vSemaphoreCreateBinary(notification_semaphore);
+	vQueueAddToRegistry(notification_semaphore, "Notification Semaphore");
+	xSemaphoreTake(notification_semaphore, 0);
+
+	/* Create a queue*/
+	Queue_id = xQueueCreate(2, sizeof(uint32_t));
 
   /* Start scheduler */
   osKernelStart();
