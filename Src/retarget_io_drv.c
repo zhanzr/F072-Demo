@@ -8,13 +8,11 @@ int stdout_putchar (int ch)
 	return ch;
 }
 #else
-int _write (int fd, const void *buf, size_t count)
+int _write(int file, char *data, int len)
 {
-	for(uint32_t i=0; i<count; ++i)
-	{
-		HAL_UART_Transmit(&huart1, buf+i, 1, 1);
-	}
-	return count;
+	HAL_UART_Transmit(&huart1, data, len, len);
+
+	return len;
 }
 #endif
 
