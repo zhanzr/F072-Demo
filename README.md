@@ -1,1 +1,3 @@
-L3GD20 gyroscope demo.
+Single Cycle or 32 Cycles Mulitiplication Instruction test.
+
+Result: Single Cycle.

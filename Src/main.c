@@ -22,6 +22,7 @@
 
 /* USER CODE BEGIN Includes */
 #include "retarget_io_drv.h"
+#include "asm_prototype.h"
 
 #ifdef __cplusplus
 #include <iostream>
@@ -489,6 +490,7 @@ int main(void)
 	int32_t JTemp;	
 	uint32_t VRef;	
 	uint32_t VBat;	
+	uint32_t tmpTick;	
   /* USER CODE END 1 */
 
   /* MCU Configuration----------------------------------------------------------*/
@@ -547,13 +549,34 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+		//Test Addition/Mulitiplication Cycles
+		#define	TEST_ADD_MUL_NUM	500000
+			//If the muliplication takes similar cycles, it is a single cycle multiplication implementation
+			tmpTick = HAL_GetTick();
+			for(uint32_t i=0; i<TEST_ADD_MUL_NUM; ++i)
+			{
+				uint32_t tn = 101;
+				asm_simple_add(tn, 456);
+			}
+			tmpTick = HAL_GetTick()-tmpTick;
+			printf("A:%u\n", tmpTick);	
+			
+			tmpTick = HAL_GetTick();
+			for(uint32_t i=0; i<TEST_ADD_MUL_NUM; ++i)
+			{		
+				uint32_t tn = 101;
+				asm_simple_mul(tn, 456);
+			}
+			tmpTick = HAL_GetTick()-tmpTick;
+			printf("M:%u\n", tmpTick);	
+		
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 		HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
 		HAL_Delay(2000);
 		
-		GYRO_IO_Read(&mems_tmp, L3GD20_OUT_TEMP_ADDR, 1);
+		GYRO_IO_Read((uint8_t*)&mems_tmp, L3GD20_OUT_TEMP_ADDR, 1);
 			
 		JTemp = ((80*g_adc_buf[0]*VDD_MV)/3300 + 30*T110_VAL_3300 - 110*T30_VAL_3300)/(T110_VAL_3300-T30_VAL_3300);
 		VRef = ADC_2_MV(g_adc_buf[1]);

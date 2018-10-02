@@ -627,6 +627,31 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>asm</GroupName>
+          <Files>
+            <File>
+              <FileName>asm_test_1.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\asm\asm_test_1.s</FilePath>
+            </File>
+            <File>
+              <FileName>asm_test_2.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\asm\asm_test_2.s</FilePath>
+            </File>
+            <File>
+              <FileName>asm_test_3.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\asm\asm_test_3.s</FilePath>
+            </File>
+            <File>
+              <FileName>asm_test_4.s</FileName>
+              <FileType>2</FileType>
+              <FilePath>..\asm\asm_test_4.s</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
         </Group>
         <Group>
