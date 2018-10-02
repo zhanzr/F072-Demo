@@ -17,3 +17,57 @@ int _write (int fd, const void *buf, size_t count)
 	return count;
 }
 #endif
+
+#ifdef __cplusplus
+namespace std {
+  struct __FILE
+  {
+    int handle;
+    /* Whatever you require here. If the only file you are using is */
+    /* standard output using printf() for debugging, no file handling */
+    /* is required. */
+  };
+  FILE __stdout;
+  FILE __stdin;
+  FILE __stderr;
+  int fgetc(FILE *f)
+  {
+    /* Your implementation of fgetc(). */
+    return 0;
+  }
+  int fputc(int c, FILE *stream)
+  {
+		stdout_putchar(c);
+		return c;
+  }
+  int ferror(FILE *stream)
+  {
+    fputc('E', stream);
+    fputc('\n', stream);
+		
+		return -1;
+  }
+  long int ftell(FILE *stream)
+  {
+    fputc('T', stream);
+    fputc('\n', stream);
+		
+		return 0;
+  }
+  int fclose(FILE *f)
+  {
+    /* Your implementation of fclose(). */
+    return 0;
+  }
+  int fseek(FILE *f, long nPos, int nMode)
+  {
+    /* Your implementation of fseek(). */
+    return 0;
+  }
+  int fflush(FILE *f)
+  {
+    /* Your implementation of fflush(). */    
+    return 0;
+  }
+}
+#endif
