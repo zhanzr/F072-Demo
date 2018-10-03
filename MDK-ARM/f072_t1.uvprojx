@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F072xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include;C:\Users\zzr\STM32Cube\Repository\STM32Cube_FW_F0_V1.9.0\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\portable\RVDS\ARM_CM0;E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\include</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include;C:\Users\zzr\STM32Cube\Repository\STM32Cube_FW_F0_V1.9.0\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;H:\FreeRTOSv10.1.1\FreeRTOS\Source\portable\RVDS\ARM_CM0;H:\FreeRTOSv10.1.1\\FreeRTOS\Source\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -640,49 +640,54 @@
           <GroupName>freertos</GroupName>
           <Files>
             <File>
-              <FileName>port.c</FileName>
+              <FileName>cmsis_os.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\portable\RVDS\ARM_CM0\port.c</FilePath>
+              <FilePath>C:\Users\zzr\STM32Cube\Repository\STM32Cube_FW_F0_V1.9.0\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</FilePath>
             </File>
             <File>
               <FileName>croutine.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\croutine.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\croutine.c</FilePath>
             </File>
             <File>
               <FileName>event_groups.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\event_groups.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\event_groups.c</FilePath>
             </File>
             <File>
               <FileName>list.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\list.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\list.c</FilePath>
             </File>
             <File>
               <FileName>queue.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\queue.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>stream_buffer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\stream_buffer.c</FilePath>
             </File>
             <File>
               <FileName>tasks.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\tasks.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\tasks.c</FilePath>
             </File>
             <File>
               <FileName>timers.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\timers.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\timers.c</FilePath>
             </File>
             <File>
               <FileName>heap_4.c</FileName>
               <FileType>1</FileType>
-              <FilePath>E:\Documents\Downloads\FreeRTOSv9.0.0\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\portable\MemMang\heap_4.c</FilePath>
             </File>
             <File>
-              <FileName>cmsis_os.c</FileName>
+              <FileName>port.c</FileName>
               <FileType>1</FileType>
-              <FilePath>C:\Users\zzr\STM32Cube\Repository\STM32Cube_FW_F0_V1.9.0\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</FilePath>
+              <FilePath>H:\FreeRTOSv10.1.1\FreeRTOS\Source\portable\RVDS\ARM_CM0\port.c</FilePath>
             </File>
           </Files>
         </Group>

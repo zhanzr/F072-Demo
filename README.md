@@ -1,2 +1,2 @@
-Freertos V9 configured by manual.
+Freertos V9 configured by manual V10.
 

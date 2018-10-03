@@ -186,6 +186,11 @@ void StartDefaultTask(void const * argument)
 		char tmpBuf[1024];
 		vTaskList(tmpBuf);
 		printf(tmpBuf);
+		
+		printf("Total Heap:%u\n", 
+		configTOTAL_HEAP_SIZE);
+//		vTaskGetRunTimeStats(tmpBuf);
+//		printf(tmpBuf);		
   }
   /* USER CODE END StartDefaultTask */
 }
