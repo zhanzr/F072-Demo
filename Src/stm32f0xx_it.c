@@ -34,7 +34,6 @@
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx.h"
 #include "stm32f0xx_it.h"
-#include "cmsis_os.h"
 
 /* USER CODE BEGIN 0 */
 
@@ -57,10 +56,11 @@ void SysTick_Handler(void)
   /* USER CODE BEGIN SysTick_IRQn 0 */
 
   /* USER CODE END SysTick_IRQn 0 */
-  HAL_IncTick();
-  osSystickHandler();
-  /* USER CODE BEGIN SysTick_IRQn 1 */
+	void freertos_tick_handler( void );
 
+  HAL_IncTick();
+  /* USER CODE BEGIN SysTick_IRQn 1 */
+	freertos_tick_handler();
   /* USER CODE END SysTick_IRQn 1 */
 }
 

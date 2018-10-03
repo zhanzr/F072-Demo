@@ -337,7 +337,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F072xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include;C:\Users\zzr\STM32Cube\Repository\STM32Cube_FW_F0_V1.9.0\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS;H:\FreeRTOSv10.1.1\FreeRTOS\Source\portable\RVDS\ARM_CM0;H:\FreeRTOSv10.1.1\\FreeRTOS\Source\include</IncludePath>
+              <IncludePath>../Inc;../Drivers/STM32F0xx_HAL_Driver/Inc;../Drivers/STM32F0xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F0xx/Include;../Drivers/CMSIS/Include;H:\FreeRTOSv10.1.1\FreeRTOS\Source\portable\RVDS\ARM_CM0;H:\FreeRTOSv10.1.1\\FreeRTOS\Source\include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -392,6 +392,11 @@
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
+              <FileName>main.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/main.c</FilePath>
+            </File>
+            <File>
               <FileName>l3gd20.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\l3gd20.c</FilePath>
@@ -400,11 +405,6 @@
               <FileName>gyro.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\gyro.c</FilePath>
-            </File>
-            <File>
-              <FileName>main.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/main.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -639,11 +639,6 @@
         <Group>
           <GroupName>freertos</GroupName>
           <Files>
-            <File>
-              <FileName>cmsis_os.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>C:\Users\zzr\STM32Cube\Repository\STM32Cube_FW_F0_V1.9.0\Middlewares\Third_Party\FreeRTOS\Source\CMSIS_RTOS\cmsis_os.c</FilePath>
-            </File>
             <File>
               <FileName>croutine.c</FileName>
               <FileType>1</FileType>

@@ -10,7 +10,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f0xx_hal.h"
-#include "cmsis_os.h"
 #include "adc.h"
 #include "crc.h"
 #include "dma.h"
@@ -42,6 +41,9 @@ using namespace std;
 #include "gyro.h"
 #include "l3gd20.h"
 #include "retarget_io_drv.h"
+
+#include "FreeRTOS.h"
+#include "task.h"
 //using namespace std;
 /* USER CODE END Includes */
 
@@ -65,9 +67,6 @@ void MX_FREERTOS_Init(void);
 __IO int16_t g_adc_buf[ADC_CHAN_NO];
 __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 __IO uint8_t g_mems_id;
-
-xSemaphoreHandle notification_semaphore;
-xQueueHandle Queue_id;
 
 //Re-implement any functions that require re-implementation.
 
@@ -196,8 +195,8 @@ int main(void)
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
 
-  /* Start scheduler */
-  osKernelStart();
+  /* Start scheduler */  
+	vTaskStartScheduler();
   
   /* We should never get here as control is now taken by the scheduler */
 

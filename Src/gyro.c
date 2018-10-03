@@ -1,6 +1,5 @@
 #include "main.h"
 #include "stm32f0xx_hal.h"
-#include "cmsis_os.h"
 #include "adc.h"
 #include "crc.h"
 #include "dma.h"

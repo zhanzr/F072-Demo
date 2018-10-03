@@ -10,10 +10,12 @@
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
+#include "main.h"
 #include "FreeRTOS.h"
 #include "task.h"
-#include "main.h"
-#include "cmsis_os.h"
+#include "queue.h"
+#include "semphr.h"
+#include "timers.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */ 
@@ -40,9 +42,6 @@ extern __IO uint16_t g_adc_buf[ADC_CHAN_NO];
 extern __IO uint8_t g_mems_id;
 extern __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 
-extern xSemaphoreHandle notification_semaphore;
-extern xQueueHandle Queue_id;
-
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -62,13 +61,45 @@ extern xQueueHandle Queue_id;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-osThreadId defaultTaskHandle;
-osThreadId myTask02Handle;
-xTimerHandle Timer_id;
+TaskHandle_t g_task01_handle;
+TaskHandle_t g_task02_handle;
+SemaphoreHandle_t g_noti_sema;
+QueueHandle_t g_queue;
+TimerHandle_t g_timer;
 /* USER CODE END Variables */
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+/* Determine whether we are in thread mode or handler mode. */
+static int inHandlerMode (void)
+{
+  return __get_IPSR() != 0;
+}
+
+uint32_t getKernelSysTick(void)
+{
+  if (inHandlerMode()) {
+    return xTaskGetTickCountFromISR();
+  }
+  else {
+    return xTaskGetTickCount();
+  }
+}
+
+extern void xPortSysTickHandler(void);
+
+void freertos_tick_handler(void)
+{
+	#if (INCLUDE_xTaskGetSchedulerState  == 1 )
+		if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+		{
+	#endif  /* INCLUDE_xTaskGetSchedulerState */  
+			xPortSysTickHandler();
+	#if (INCLUDE_xTaskGetSchedulerState  == 1 )
+		}
+	#endif  /* INCLUDE_xTaskGetSchedulerState */  
+}
+
 void TimerCallback( xTimerHandle pxtimer )
 {
 		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
@@ -104,30 +135,41 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
-  defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
+	xTaskCreate((TaskFunction_t)StartDefaultTask,
+							(const portCHAR *)"defaultTask",
+							512,
+							NULL,
+							2,
+							&g_task01_handle);
 
   /* definition and creation of myTask02 */
-  osThreadDef(myTask02, StartTask02, osPriorityBelowNormal, 0, 128);
-  myTask02Handle = osThreadCreate(osThread(myTask02), NULL);
-
+	xTaskCreate((TaskFunction_t)StartTask02,
+							(const portCHAR *)"myTask02",
+							64,
+							NULL,
+							3,
+							&g_task02_handle);
+							
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
 /* Create one Software Timer.*/
-	Timer_id = xTimerCreate("Timer",100,pdTRUE,0,TimerCallback);
-	/* Start Timer.*/
-	xTimerStart( Timer_id, 0);
+	g_timer = xTimerCreate("Timer", 
+							200/ portTICK_PERIOD_MS,
+							pdTRUE,
+							0,
+							TimerCallback);
+	xTimerStart( g_timer, 0);
 
 	/* Create the notification semaphore and set the initial state. */
-	vSemaphoreCreateBinary(notification_semaphore);
-	vQueueAddToRegistry(notification_semaphore, "Notification Semaphore");
-	xSemaphoreTake(notification_semaphore, 0);
+	vSemaphoreCreateBinary(g_noti_sema);
+	vQueueAddToRegistry(g_noti_sema, "Notification Semaphore");
+	xSemaphoreTake(g_noti_sema, 0);
 
 	/* Create a queue*/
-	Queue_id = xQueueCreate(2, sizeof(uint32_t));
+	g_queue = xQueueCreate(2, sizeof(uint32_t));
   /* USER CODE END RTOS_QUEUES */
 }
 
@@ -150,10 +192,10 @@ void StartDefaultTask(void const * argument)
   /* Infinite loop */
   for(;;)
   {
-		xQueueReceive(Queue_id, &tmpTicks, portMAX_DELAY);
+		xQueueReceive(g_queue, &tmpTicks, portMAX_DELAY);
 		
 		printf("%s %u %u\n", 
-		osKernelSystemId,
+		tskKERNEL_VERSION_NUMBER,
 		tmpTicks,
 		g_adc_buf[0]
 		);
@@ -181,7 +223,7 @@ void StartDefaultTask(void const * argument)
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 //		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		
-		xSemaphoreTake(notification_semaphore, portMAX_DELAY);	
+		xSemaphoreTake(g_noti_sema, portMAX_DELAY);	
 
 		char tmpBuf[1024];
 		vTaskList(tmpBuf);
@@ -191,6 +233,8 @@ void StartDefaultTask(void const * argument)
 		configTOTAL_HEAP_SIZE);
 //		vTaskGetRunTimeStats(tmpBuf);
 //		printf(tmpBuf);		
+
+		printf("\n");
   }
   /* USER CODE END StartDefaultTask */
 }
@@ -211,12 +255,12 @@ void StartTask02(void const * argument)
 		HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 //		HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
 
-		xSemaphoreGive(notification_semaphore);		
+		xSemaphoreGive(g_noti_sema);		
 		
-		uint32_t tmpTick = osKernelSysTick();
-		xQueueSend(Queue_id, &tmpTick, 0);
+		uint32_t tmpTick = getKernelSysTick();
+		xQueueSend(g_queue, &tmpTick, 0);
 
-    osDelay(1000);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
   /* USER CODE END StartTask02 */
 }
