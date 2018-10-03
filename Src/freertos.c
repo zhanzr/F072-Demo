@@ -62,14 +62,17 @@ extern xQueueHandle Queue_id;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
-
-/* USER CODE END Variables */
 osThreadId defaultTaskHandle;
 osThreadId myTask02Handle;
+xTimerHandle Timer_id;
+/* USER CODE END Variables */
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
-   
+void TimerCallback( xTimerHandle pxtimer )
+{
+		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
+}
 /* USER CODE END FunctionPrototypes */
 
 void StartDefaultTask(void const * argument);
@@ -101,7 +104,7 @@ void MX_FREERTOS_Init(void) {
 
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 256);
+  osThreadDef(defaultTask, StartDefaultTask, osPriorityNormal, 0, 512);
   defaultTaskHandle = osThreadCreate(osThread(defaultTask), NULL);
 
   /* definition and creation of myTask02 */
@@ -113,7 +116,18 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE END RTOS_THREADS */
 
   /* USER CODE BEGIN RTOS_QUEUES */
-  /* add queues, ... */
+/* Create one Software Timer.*/
+	Timer_id = xTimerCreate("Timer",100,pdTRUE,0,TimerCallback);
+	/* Start Timer.*/
+	xTimerStart( Timer_id, 0);
+
+	/* Create the notification semaphore and set the initial state. */
+	vSemaphoreCreateBinary(notification_semaphore);
+	vQueueAddToRegistry(notification_semaphore, "Notification Semaphore");
+	xSemaphoreTake(notification_semaphore, 0);
+
+	/* Create a queue*/
+	Queue_id = xQueueCreate(2, sizeof(uint32_t));
   /* USER CODE END RTOS_QUEUES */
 }
 
@@ -129,7 +143,6 @@ void StartDefaultTask(void const * argument)
   /* USER CODE BEGIN StartDefaultTask */
 	int8_t mems_tmp;
 	int32_t JTemp;	
-	uint32_t VRef;	
 	uint32_t tmpTicks;	
 	
   float Buffer[6] = {0};  
@@ -148,10 +161,9 @@ void StartDefaultTask(void const * argument)
 		GYRO_IO_Read((uint8_t*)&mems_tmp, L3GD20_OUT_TEMP_ADDR, 1);
 			
 		JTemp = ((80*g_adc_buf[0]*VDD_MV)/3300 + 30*T110_VAL_3300 - 110*T30_VAL_3300)/(T110_VAL_3300-T30_VAL_3300);
-		VRef = ADC_2_MV(g_adc_buf[1]);
 		
 		printf("%02X %d %d %d %d\n",
-		g_mems_id, mems_tmp, JTemp, VRef, 2 * ADC_2_MV(g_adc_buf[2]));
+		g_mems_id, mems_tmp, JTemp, ADC_2_MV(g_adc_buf[1]), 2 * ADC_2_MV(g_adc_buf[2]));
 				
 		GYRO_IO_Read((uint8_t*)g_mems_buf, L3GD20_OUT_X_L_ADDR, MEMS_CHAN_NO*2);
 		printf("X: %d, Y: %d, Z: %d\n", 
@@ -169,7 +181,11 @@ void StartDefaultTask(void const * argument)
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 //		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		
-		xSemaphoreTake(notification_semaphore, portMAX_DELAY);		
+		xSemaphoreTake(notification_semaphore, portMAX_DELAY);	
+
+		char tmpBuf[1024];
+		vTaskList(tmpBuf);
+		printf(tmpBuf);
   }
   /* USER CODE END StartDefaultTask */
 }

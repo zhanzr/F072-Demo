@@ -1,2 +1,2 @@
-Freertos configured by CubeMX.
+Freertos V9 configured by manual.
 

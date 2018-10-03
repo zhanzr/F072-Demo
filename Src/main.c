@@ -66,7 +66,6 @@ __IO int16_t g_adc_buf[ADC_CHAN_NO];
 __IO int16_t g_mems_buf[MEMS_CHAN_NO];
 __IO uint8_t g_mems_id;
 
-xTimerHandle Timer_id;
 xSemaphoreHandle notification_semaphore;
 xQueueHandle Queue_id;
 
@@ -128,10 +127,6 @@ static void MEMS_Test(void)
 
 }
 
-void TimerCallback( xTimerHandle pxtimer )
-{
-		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
-}
 /* USER CODE END 0 */
 
 /**
@@ -200,19 +195,6 @@ int main(void)
 
   /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
-
-	/* Create one Software Timer.*/
-	Timer_id = xTimerCreate("Timer",500,pdTRUE,0,TimerCallback);
-	/* Start Timer.*/
-	xTimerStart( Timer_id, 0);
-
-	/* Create the notification semaphore and set the initial state. */
-	vSemaphoreCreateBinary(notification_semaphore);
-	vQueueAddToRegistry(notification_semaphore, "Notification Semaphore");
-	xSemaphoreTake(notification_semaphore, 0);
-
-	/* Create a queue*/
-	Queue_id = xQueueCreate(2, sizeof(uint32_t));
 
   /* Start scheduler */
   osKernelStart();
@@ -311,7 +293,7 @@ void SystemClock_Config(void)
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);
 
   /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 3, 0);
+  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
 /* USER CODE BEGIN 4 */
