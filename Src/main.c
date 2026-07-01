@@ -1,20 +1,20 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2026 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -38,7 +38,7 @@
 
 #include "retarget_io_drv.h"
 
-#include "lcd2004.h"
+#include "lcd_st7735.h"
 
 /* USER CODE END Includes */
 
@@ -76,7 +76,12 @@ void SystemClock_Config(void);
 #define	ADC_CHAN_NO	3
 __IO uint16_t g_ADCBuf[ADC_CHAN_NO];
 
-uint8_t line[4][21] = {"HD44780 ic", "LCM-S02004DSR", "4 Bit mode", "display example"};
+__IO uint16_t g_ADCBuf[ADC_CHAN_NO];
+
+uint8_t tmp_color_idx = 0;
+const uint16_t tmp_color_table[] = { WHITE, BLACK, RED, GREEN, BLUE };
+#define	COLOR_TABLE_LEN	(sizeof(tmp_color_table) / sizeof(tmp_color_table[0]))
+uint8_t test_y_idx = 0;
 /* USER CODE END 0 */
 
 /**
@@ -120,55 +125,55 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	printf("F072 Discovery Test CM0 rev:%u, @ %u Hz\n %u %u %u\n",
-		__CM0_REV,
-		SystemCoreClock,
-		*(uint16_t*)(0x1FFFF7B8),
-		*(uint16_t*)(0x1FFFF7C2),
-		*(uint16_t*)(0x1FFFF7BA)
-		);
+	__CM0_REV, SystemCoreClock, *(uint16_t*) (0x1FFFF7B8),
+			*(uint16_t*) (0x1FFFF7C2), *(uint16_t*) (0x1FFFF7BA));
 	printf("%08X, %08X\n", SCB->CPUID, (1UL << SCB_AIRCR_ENDIANESS_Pos));
-			
+
 	HAL_TIM_Base_Start(&htim2);
 	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
 	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, 320);
 
-	HAL_ADC_Start_DMA(&hadc, (uint32_t*)g_ADCBuf, ADC_CHAN_NO);	
+	HAL_ADC_Start_DMA(&hadc, (uint32_t*) g_ADCBuf, ADC_CHAN_NO);
 
-	  LCD_Initialize();
+	st7735_Init();
 
-	  LCD_displayL(0, 0, line[0]);
-	  LCD_displayL(1, 0, line[1]);
-	  LCD_displayL(2, 0, line[2]);
-	  LCD_displayL(3, 0, line[3]);
+	Lcd_Clear(WHITE);
+
+	Gui_DrawFont_GBK16(0, 60, BLUE, GRAY0, "N:1");
+	Gui_DrawFont_GBK16(20, 20, RED, GRAY0, "X:2");
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	  uint32_t test_pwm_duty = 0;
-	  char g_test_lcd_buf[LINE_NUM][21];
-  while (1)
-  {
-		printf("%u %u %u\n",
-		g_ADCBuf[0], g_ADCBuf[1], g_ADCBuf[2]
-		);
-		
+	uint8_t g_line_buf[40] = { };
+	while (1) {
+		HAL_Delay(1500);
+
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 		HAL_GPIO_TogglePin(LD4_GPIO_Port, LD4_Pin);
 		HAL_GPIO_TogglePin(LD5_GPIO_Port, LD5_Pin);
 		HAL_GPIO_TogglePin(LD6_GPIO_Port, LD6_Pin);
-		
-		HAL_IWDG_Refresh(&hiwdg);		
-		
-		HAL_Delay(3000);
 
-		sprintf(g_test_lcd_buf[0], "%u %u %u",
-				g_ADCBuf[0], g_ADCBuf[1], g_ADCBuf[2]);
-		LCD_displayL(0, 0, g_test_lcd_buf[0]);
+		HAL_IWDG_Refresh(&hiwdg);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+		uint32_t tmp_ticks = HAL_GetTick();
+		//		Lcd_Clear(tmp_color_table[tmp_color_idx]);
+		Gui_DrawLine(0, test_y_idx, ST7735_LCD_PIXEL_WIDTH - 1, test_y_idx,
+				RED);
+		uint32_t delta_ticks = HAL_GetTick() - tmp_ticks;
 
-  }
+		printf("%u %u %u %u\n", g_ADCBuf[0], g_ADCBuf[1], g_ADCBuf[2],
+				delta_ticks);
+
+		sprintf(g_line_buf, "%u %u %u", g_ADCBuf[0], delta_ticks, test_y_idx);
+		Gui_DrawFont_GBK16(20, 20, ~tmp_color_table[tmp_color_idx],
+				tmp_color_table[tmp_color_idx], g_line_buf);
+		//		tmp_color_idx = (tmp_color_idx + 1) % COLOR_TABLE_LEN;
+
+		test_y_idx = (test_y_idx + 1) % ST7735_LCD_PIXEL_HEIGHT;
+	}
   /* USER CODE END 3 */
 }
 
@@ -232,10 +237,9 @@ void SystemClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  while(1) 
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	while (1) {
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 #ifdef USE_FULL_ASSERT

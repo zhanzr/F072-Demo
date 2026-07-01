@@ -99,15 +99,10 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF3_TSC;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : DB4_Pin DB5_Pin DB6_Pin DB7_Pin */
-  GPIO_InitStruct.Pin = DB4_Pin|DB5_Pin|DB6_Pin|DB7_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : E_Pin RW_Pin */
-  GPIO_InitStruct.Pin = E_Pin|RW_Pin;
+  /*Configure GPIO pins : DB4_Pin DB5_Pin DB6_Pin DB7_Pin
+                           E_Pin RW_Pin */
+  GPIO_InitStruct.Pin = DB4_Pin|DB5_Pin|DB6_Pin|DB7_Pin
+                          |E_Pin|RW_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
